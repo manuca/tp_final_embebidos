@@ -6,7 +6,6 @@
 #endif
 #endif
 
-#include <cr_section_macros.h>
 #include "signal_data.h"
 
 /*
@@ -32,7 +31,7 @@
 
 #ifdef __LPC43XX__
 #define DAC_REGISTER LPC_DAC
-#define ADC_PERIPH  LPC_ADC
+#define ADC_PERIPH  LPC_ADC0
 #define ADC_CHANNEL ADC_CH0
 #define ADC_IRQ_HANDLER ADC0_IRQHandler
 #define ADC_IRQ ADC0_IRQn
@@ -45,7 +44,9 @@ void initDAC()
 {
 #ifdef __LPC43XX__
   Board_DAC_Init(LPC_DAC);
+  LPC_DAC->CTRL |= (1 << 3);
 #endif
+
   Chip_DAC_Init(LPC_DAC);
 }
 
@@ -81,8 +82,11 @@ void RIT_IRQHandler()
  */
 void initRIT()
 {
+
+#ifdef __LPC17XX__
   Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_RIT);
   Chip_Clock_SetPCLKDiv(SYSCTL_PCLK_RIT, SYSCTL_CLKDIV_1);
+#endif
 
   LPC_RITIMER->COMPVAL = (SystemCoreClock / BASE_FREQUENCY);
   LPC_RITIMER->MASK    = 0xFFFFFFFF;
@@ -108,6 +112,7 @@ void initADC()
   Chip_ADC_Int_SetChannelCmd(ADC_PERIPH, ADC_CHANNEL, ENABLE);
   Chip_ADC_SetBurstCmd(ADC_PERIPH, DISABLE);
   Chip_ADC_SetStartMode(ADC_PERIPH, ADC_START_NOW, ADC_TRIGGERMODE_RISING);
+  NVIC_EnableIRQ(ADC_IRQ);
 }
 
 int main(void)
@@ -121,7 +126,6 @@ int main(void)
     initRIT();
     initADC();
 
-    NVIC_EnableIRQ(ADC_IRQ);
     NVIC_EnableIRQ(RITIMER_IRQn);
 
     while(1) {
