@@ -27,6 +27,7 @@
 #define ADC_PERIPH  LPC_ADC
 #define ADC_CHANNEL ADC_CH0
 #define ADC_IRQ_HANDLER ADC_IRQHandler
+#define ADC_IRQ ADC_IRQn
 #endif
 
 #ifdef __LPC43XX__
@@ -34,6 +35,7 @@
 #define ADC_PERIPH  LPC_ADC
 #define ADC_CHANNEL ADC_CH0
 #define ADC_IRQ_HANDLER ADC0_IRQHandler
+#define ADC_IRQ ADC0_IRQn
 #endif
 
 
@@ -119,7 +121,7 @@ int main(void)
     initRIT();
     initADC();
 
-    NVIC_EnableIRQ(ADC_IRQn);
+    NVIC_EnableIRQ(ADC_IRQ);
     NVIC_EnableIRQ(RITIMER_IRQn);
 
     while(1) {
